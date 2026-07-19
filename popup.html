@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>WhatsApp Alert System</title>
+  <link rel="stylesheet" href="popup.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="popup-container">
+
+    <!-- ============================================================= -->
+    <!-- HEADER -->
+    <!-- ============================================================= -->
+    <header class="header">
+      <div class="header-content">
+        <div class="header-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9" />
+            <path d="M13.73 21a2 2 0 0 1-3.46 0" />
+          </svg>
+          <div class="header-icon-pulse" id="headerPulse"></div>
+        </div>
+        <div class="header-text">
+          <h1>WA Alert System</h1>
+          <span class="header-subtitle" id="headerSubtitle">Configure your alert monitor</span>
+        </div>
+      </div>
+      <div class="header-status" id="headerStatus">
+        <span class="status-dot" id="statusDot"></span>
+        <span class="status-label" id="statusLabel">Inactive</span>
+      </div>
+    </header>
+
+    <!-- ============================================================= -->
+    <!-- STATUS DASHBOARD -->
+    <!-- ============================================================= -->
+    <section class="section status-dashboard" id="statusDashboard">
+      <div class="status-grid">
+        <div class="status-card" id="monitoringCard">
+          <div class="status-card-icon monitoring-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label">Monitoring</span>
+            <span class="status-card-value" id="monitoringStatus">Inactive</span>
+          </div>
+        </div>
+        <div class="status-card" id="alarmCard">
+          <div class="status-card-icon alarm-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+              <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+            </svg>
+          </div>
+          <div class="status-card-info">
+            <span class="status-card-label">Alarm</span>
+            <span class="status-card-value" id="alarmStatus">Silent</span>
+          </div>
+        </div>
+      </div>
+      <div class="status-times">
+        <div class="status-time-item">
+          <span class="time-label">Last Trigger</span>
+          <span class="time-value" id="lastTriggerTime">—</span>
+        </div>
+        <div class="status-time-item">
+          <span class="time-label">Last Stop</span>
+          <span class="time-value" id="lastStopTime">—</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- MONITORING SETTINGS -->
+    <!-- ============================================================= -->
+    <section class="section">
+      <div class="section-header" data-toggle="monitoringSettings">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+          Monitoring Settings
+        </h2>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="section-body open" id="monitoringSettings">
+        <div class="form-group">
+          <label for="triggerGroup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="label-icon">
+              <polygon points="7.86 2 16.14 2 22 7.86 22 16.14 16.14 22 7.86 22 2 16.14 2 7.86 7.86 2"/>
+              <line x1="12" y1="8" x2="12" y2="12"/>
+              <line x1="12" y1="16" x2="12.01" y2="16"/>
+            </svg>
+            Trigger Group Name
+          </label>
+          <input type="text" id="triggerGroup" placeholder="e.g. 🚨 Production Alerts" autocomplete="off" />
+          <span class="input-hint">New messages in this group will trigger the alarm</span>
+        </div>
+        <div class="form-group">
+          <label for="stopGroup">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="label-icon">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            Stop Group Name
+          </label>
+          <input type="text" id="stopGroup" placeholder="e.g. 🛠 Operations Team" autocomplete="off" />
+          <span class="input-hint">Stop commands in this group will silence the alarm</span>
+        </div>
+        <div class="control-row">
+          <button class="btn btn-primary" id="btnEnable">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Enable Monitoring
+          </button>
+          <button class="btn btn-danger" id="btnDisable" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="6" y="4" width="4" height="16"/>
+              <rect x="14" y="4" width="4" height="16"/>
+            </svg>
+            Disable Monitoring
+          </button>
+          <button class="btn btn-warning" id="btnStopAlarm" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            </svg>
+            Stop Alarm
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- STOP COMMAND SETTINGS -->
+    <!-- ============================================================= -->
+    <section class="section">
+      <div class="section-header" data-toggle="stopCommandSettings">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+            <polyline points="4 17 10 11 4 5"/>
+            <line x1="12" y1="19" x2="20" y2="19"/>
+          </svg>
+          Stop Commands
+        </h2>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="section-body" id="stopCommandSettings">
+        <div class="form-group">
+          <label>Stop Keywords</label>
+          <div class="tags-container" id="stopCommandTags"></div>
+          <div class="tag-input-row">
+            <input type="text" id="newStopCommand" placeholder="Add stop command..." />
+            <button class="btn btn-small btn-accent" id="btnAddCommand">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add
+            </button>
+          </div>
+          <span class="input-hint">Messages matching these commands will stop the alarm</span>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row">
+            <label for="partialMatch">Partial Match (contains)</label>
+            <label class="toggle">
+              <input type="checkbox" id="partialMatch" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+          <span class="input-hint">If ON, any message containing the keyword will match. If OFF, exact match only.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- ALARM SETTINGS -->
+    <!-- ============================================================= -->
+    <section class="section">
+      <div class="section-header" data-toggle="alarmSettings">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+            <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+            <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+            <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+          </svg>
+          Alarm Settings
+        </h2>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="section-body" id="alarmSettings">
+        <div class="form-group">
+          <label for="volumeSlider">
+            Volume
+            <span class="volume-value" id="volumeValue">100%</span>
+          </label>
+          <input type="range" id="volumeSlider" min="0" max="100" value="100" class="volume-slider" />
+        </div>
+        <div class="control-row">
+          <button class="btn btn-small btn-accent" id="btnTestAlarm">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon points="5 3 19 12 5 21 5 3"/>
+            </svg>
+            Test Alarm
+          </button>
+          <button class="btn btn-small btn-secondary" id="btnStopTest" style="display:none">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+            </svg>
+            Stop Test
+          </button>
+        </div>
+        <div class="form-group">
+          <label for="customAlarm">Custom Alarm (MP3)</label>
+          <div class="file-upload-row">
+            <label class="btn btn-small btn-secondary file-label" for="customAlarmFile">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                <polyline points="17 8 12 3 7 8"/>
+                <line x1="12" y1="3" x2="12" y2="15"/>
+              </svg>
+              Upload MP3
+            </label>
+            <input type="file" id="customAlarmFile" accept=".mp3,audio/mpeg" style="display:none" />
+            <button class="btn btn-small btn-secondary" id="btnRestoreDefault">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="1 4 1 10 7 10"/>
+                <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+              </svg>
+              Default
+            </button>
+          </div>
+          <span class="input-hint" id="customAlarmName">Using default alarm sound</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- ADVANCED SETTINGS -->
+    <!-- ============================================================= -->
+    <section class="section">
+      <div class="section-header" data-toggle="advancedSettings">
+        <h2>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="section-icon">
+            <circle cx="12" cy="12" r="3"/>
+            <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+          </svg>
+          Advanced Settings
+        </h2>
+        <svg class="chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="6 9 12 15 18 9"/>
+        </svg>
+      </div>
+      <div class="section-body" id="advancedSettings">
+        <div class="form-group">
+          <div class="toggle-row">
+            <label for="ignoreOwn">Ignore Own Messages</label>
+            <label class="toggle">
+              <input type="checkbox" id="ignoreOwn" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row">
+            <label for="desktopNotif">Desktop Notifications</label>
+            <label class="toggle">
+              <input type="checkbox" id="desktopNotif" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row">
+            <label for="badgeNotif">Badge Notifications</label>
+            <label class="toggle">
+              <input type="checkbox" id="badgeNotif" checked />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="form-group">
+          <div class="toggle-row">
+            <label for="devLogs">Developer Logs</label>
+            <label class="toggle">
+              <input type="checkbox" id="devLogs" />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============================================================= -->
+    <!-- FOOTER ACTIONS -->
+    <!-- ============================================================= -->
+    <footer class="footer">
+      <button class="btn btn-primary btn-full" id="btnSave">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/>
+          <polyline points="17 21 17 13 7 13 7 21"/>
+          <polyline points="7 3 7 8 15 8"/>
+        </svg>
+        Save Settings
+      </button>
+      <button class="btn btn-ghost" id="btnReset">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="1 4 1 10 7 10"/>
+          <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+        </svg>
+        Reset to Defaults
+      </button>
+      <div class="toast" id="toast"></div>
+    </footer>
+
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>

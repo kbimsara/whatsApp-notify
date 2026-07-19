@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>WhatsApp Alert - Offscreen Audio</title>
+</head>
+<body>
+  <!--
+    Offscreen document for playing alarm audio.
+    This document is created by the background service worker
+    and is not visible to the user.
+  -->
+  <audio id="alarm-audio" preload="auto"></audio>
+  <script src="offscreen.js"></script>
+</body>
+</html>
