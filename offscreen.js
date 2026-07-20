@@ -35,25 +35,28 @@
 
     for (let i = 0; i < numSamples; i++) {
       const t = i / sampleRate;
-      // Create an alternating two-tone alarm pattern
-      // Tone 1: 800Hz for 0.25s, Tone 2: 600Hz for 0.25s, repeat
+      // Create a harsh, classic buzzer pattern: pulsing 0.3s on, 0.2s off
       const cyclePos = t % 0.5;
-      const freq = cyclePos < 0.25 ? 800 : 600;
+      const isOn = cyclePos < 0.3;
       
-      // Generate square-ish wave for harsh buzzer sound
-      const sine = Math.sin(2 * Math.PI * freq * t);
-      const harmonic2 = Math.sin(2 * Math.PI * freq * 2 * t) * 0.5;
-      const harmonic3 = Math.sin(2 * Math.PI * freq * 3 * t) * 0.3;
-      
-      // Envelope: slight attack/release per cycle to avoid clicks
-      const envCyclePos = t % 0.25;
-      const attack = Math.min(envCyclePos / 0.01, 1.0);
-      const release = Math.min((0.25 - envCyclePos) / 0.01, 1.0);
-      const envelope = Math.min(attack, release);
-      
-      buffer[i] = (sine + harmonic2 + harmonic3) * 0.7 * envelope;
-      // Clip to [-1, 1]
-      buffer[i] = Math.max(-1, Math.min(1, buffer[i]));
+      if (isOn) {
+        // Dissonant frequencies create a harsh "buzz"
+        const f1 = 300;
+        const f2 = 330;
+        
+        // True square waves for maximum harshness
+        const s1 = Math.sign(Math.sin(2 * Math.PI * f1 * t));
+        const s2 = Math.sign(Math.sin(2 * Math.PI * f2 * t));
+        
+        // Envelope: 10ms attack/release to prevent speaker popping
+        let envelope = 1.0;
+        if (cyclePos < 0.01) envelope = cyclePos / 0.01;
+        else if (cyclePos > 0.29) envelope = (0.3 - cyclePos) / 0.01;
+        
+        buffer[i] = (s1 + s2) * 0.4 * envelope;
+      } else {
+        buffer[i] = 0;
+      }
     }
 
     // Encode as WAV
