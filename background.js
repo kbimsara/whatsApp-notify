@@ -475,14 +475,21 @@
 
       case 'CONTENT_SCRIPT_READY':
         log('Content script connected');
-        // Send current monitoring state to content script
-        sendResponse({
-          success: true,
-          monitoringEnabled: state.monitoringEnabled,
-          triggerGroup: settings.triggerGroup,
-          stopGroup: settings.stopGroup
+        // Ensure settings are loaded before responding
+        loadSettings().then(() => {
+          log('Responding to content script with:', {
+            monitoringEnabled: state.monitoringEnabled,
+            triggerGroup: settings.triggerGroup,
+            stopGroup: settings.stopGroup
+          });
+          sendResponse({
+            success: true,
+            monitoringEnabled: state.monitoringEnabled,
+            triggerGroup: settings.triggerGroup,
+            stopGroup: settings.stopGroup
+          });
         });
-        break;
+        return true; // async response
 
       // --- From Popup ---
       case 'GET_STATE':
@@ -500,8 +507,13 @@
         saveState();
         updateBadge();
         broadcastState();
-        // Notify content script
-        notifyContentScripts({ type: 'MONITORING_STATE_CHANGED', enabled: true });
+        // Notify content script with group names so it knows what to monitor
+        notifyContentScripts({
+          type: 'MONITORING_STATE_CHANGED',
+          enabled: true,
+          triggerGroup: settings.triggerGroup,
+          stopGroup: settings.stopGroup
+        });
         sendResponse({ success: true });
         break;
 
